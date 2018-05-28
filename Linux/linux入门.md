@@ -3046,23 +3046,339 @@ a
 
 ## 10.3.4 多命令顺序执行与管道符
 
+1. 多命令顺序执行
+
+   | 多命令执行符 | 格式           | 作用                                                         |
+   | ------------ | -------------- | ------------------------------------------------------------ |
+   | ;            | 命令1；命令2   | 多个命令顺序执行，命令之间没有任何逻辑联系                   |
+   | &&           | 命令1&&命令2   | 逻辑与<br />当命令1正确执行，则命令2才会执行<br />当命令1执行不正确，则命令2不会执行 |
+   | \|\|         | 命令1\|\|命令2 | 逻辑或<br />当命令1执行不正确，则命令2才会执行<br />当命令1正确执行，则命令2不会执行 |
+   |              |                |                                                              |
+
+   **例子**
+
+   ~~~
+   [root@localhost~]# ls; date; cd /user; pwd
+   #cd /user会报错，原因是根目录下没有user目录，但是不影响后面的pwd的执行
+   ~~~
+
+   ~~~
+   [root@localhost~]# dd if=输入文件 of=输出文件 bs=字节数 count=个数
+   选项：
+   	if=输入文件 	指定源文件或源设备
+   	of=输出文件 	指定目标文件或目标设备
+   	bs=字节数		 指定一次输入/输出多少字节，即把这些字节看做一个数据块
+   	count=个数 	  指定输入/输出多少个数据块
+       
+   例子：
+   [root@localhost~]# date ; dd if=/dev/zero of=/root/testfile bs=1k count=100000; date
+   #/dev/zero  0
+   ~~~
+
+   ~~~
+   [root@localhost~]# ls anaconda-ks.cfg && echo yes
+   
+   [root@localhost~]# ls /root/test || echo "no
+   
+   [root@localhost~]# 命令 && echo yes || echo no
+   #可以用这种方法判断命令是否正确
+   
+   
+   ~~~
+
+   2. 管道符
+
+   命令格式：
+
+   
+
+   ~~~
+   [root@localhost~]# 命令 | 命令2
+   #命令1的正确输出作为命令2的操作对象
+   颜色显示
+   
+   ~~~
+
+   例子：
+
+   ~~~
+   [root@localhost~]# ll -a /etc/ | more
+   #more是用来分屏显示文件内容用的，但是在这里使用了|符，则可以分屏显示 ll -a /etc/ 的输出结果
+   
+   [root@localhost~]# netstat -an | grep "ESTABLISHED"
+   ~~~
+
+- grep命令
+
+~~~
+[root@localhost~]# grep [选项] "搜索内容" 文件名
+选项：
+	-i : 忽略大小写
+	-n:  输出行号
+	-v:  反向查找
+	--color=auto 把搜索出的关键字用颜色显示	
+~~~
+
+
+
 ## 10.3.5 通配符与其他特殊符号
 
 
+
+1. 通配符
+
+| 通配符 | 作用                                                         |
+| :----: | :----------------------------------------------------------- |
+|   ？   | 匹配一个任意字符                                             |
+|   *    | 匹配0个或任意多个任意字符，也就是可以匹配任何内容            |
+|  [  ]  | 匹配中括号中任意一个字符。例如：[abc]代表一定匹配一个字符，或者是a,或者是b,或者是c |
+| [ - ]  | 匹配中括号中任意一个字符，-代表一个范围。例如：[a-z]代表匹配一个小写字母 |
+| [ ^ ]  | 逻辑非，表示匹配不是中括号内的一个字符。例如：**[^0-9]**代表匹配一个不是数字的字符 |
+
+例：
+
+~~~
+
+[root@localhost ~]# cd /tmp/
+[root@localhost tmp]# rm -rf *
+[root@localhost tmp]# touch abc
+[root@localhost tmp]# touch abcd
+[root@localhost tmp]# touch 012
+[root@localhost tmp]# touch 0abc
+[root@localhost tmp]# ls ?abc
+[root@localhost tmp]# ls [0-9]*
+[root@localhost tmp]# ls [^0-9]*
+~~~
+
+2. Bash中其他特殊符号
+
+| 符号 | 作用                                                         |
+| ---- | ------------------------------------------------------------ |
+| ''   | 单引号。 在单引号中所有的特殊符号，如“$”和“`”（反引号）都没有特殊含义 |
+| ""   | 双引号。在双引号中特殊符号都没有特殊含义，但是“$”、"`"和“\”是例外，拥有“调用变量的值”、“引用命令”和“转义符”的特殊含义。 |
+| ``   | 反引号。反引号括起来的内容是系统命令，在Bash中会先执行它。和$()作用一样，不过推荐使用$()，因为反引号非常容易看错。 |
+| $()  | 和反引号作用一样，用来引用系统命令。                         |
+| #    | 在Shell脚本中，#开头的行代表注释                             |
+| $    | 用于调用变量的值，如需要调用变量name的值时，需 要用$name的方式得到变量的值。 |
+| \    | 转义符，跟在\之后的特殊符号将失去特殊含义，变为普通字符。如\\$将输出“$”符号，而不当做是变量引用。 |
+
+单引号与双引号
+
+~~~
+[root@localhost ~]# name=sc
+[root@localhost ~]# echo '$name'
+$name
+[root@localhost ~]# echo "$name"
+sc
+[root@localhost ~]# echo '$(date)'
+$(date)
+[root@localhost ~]# echo "$(date)"
+2018年 05月 28日 星期一 22:37:10 CST
+~~~
+
+反引号与$()
+
+~~~
+[root@localhost ~]# abc='date' 
+#建议使用abc=$(date)
+[root@localhost ~]# echo $abc
+2018年 05月 28日 星期一 22:37:10 CST
+
+[root@localhost ~]# echo ls
+ls
+[root@localhost ~]# echo $(ls)
+abc anaconda-ks.cfg install.log install.log.syslog Japanlovestory.list sh testfile
+
+~~~
 
 
 
 ## 10.4 Bash的变量
 
+### 10.4.1 用户自定义变量
+
+1. 什么是变量
+
+- 变量是计算机内存的单元，其中存放的值可以改变。当Shell脚本需要保存一些信息时，如一个文件名或是一个数字，就把它存放在一个变量中。每个变量有一个名字，所以很容易引用它。使用变量可以保存有用的信息，使系统获知用户相关设置，变量也可以用于保存暂时信息。
+
+2. 变量设置规则
+
+- 变量名称可以由字母、数字或下划线组成，但是不能以数字开头。如果变量名是"2name"则是错误的。
+- 在Bash中，变量的默认类型都是字符串型，如果要进行数值运算，则必修指定变量类型为数值型。
+- 变量用等号连接值，等号左右两侧不能有空格。
+- 变量的值如果有空格，需要使用单引号或双引号包括。
+- 在变量的值中，可以使用"\"转义符。
+- 如果需要增加变量的值，那么可以进行变量值的叠加。不过变量需要用双引号包含“$变量名”或用${变量名}包含。
+- 如果是把命令的结果作为变量值赋予变量，则需要使用反引号或$（）包含命令。
+- 环境变量名建议大写，便于区分。
+
+3. 变量分类
+
+- 用户自定义变量
+- 环境变量：这种变量中主要保存的是和系统操作环境相关的数据。
+- 位置参数变量：这种变量主要是用来向脚本当中传递参数或数据的，变量名不能自定义，变量作用是固定的。
+- 预定义变量：是Bash中已经定义好的变量，变量名不能自定义，变量作用也是固定的。
+
+4. 本地变量（用户自定义变量）
+
+- 变量定义
+
+~~~
+[root@localhost ~]# name="axin"
+~~~
+
+- 变量叠加
+
+~~~
+[root@localhost ~]# aa=123
+[root@localhost ~]# aa="$aa"456
+[root@localhost ~]# echo $aa
+123456
+[root@localhost ~]# aa=${aa}789
+[root@localhost ~]# echo $aa
+123456789
+~~~
+
+- 变量调用
+
+~~~
+[root@localhost ~]# echo $name
+~~~
+
+- 变量查看
+
+~~~
+[root@localhost ~]# set
+~~~
+
+- 变量删除
+
+~~~
+[root@localhost ~]# unset name
+~~~
+
+
+
+### 10.4.2 环境变量
+
+1. 环境变量是什么
+
+- 用户自定义变量只在当前Shell中生效，而环境变量会在当前Shell和这个Shell的所有子Shell当中生效。如果把环境变量写入相应的配置文件，那么这个环境变量就会在系统中所有的Shell中生效
+
+2. 设置环境变量
+
+~~~
+[root@localhost ~]# export 变量名=变量值
+#申明变量
+
+[root@localhost ~]# env
+#set用来查询所有变量
+#env专门用来查询环境变量
+
+[root@localhost ~]# unset 变量名
+#删除变量
+
+~~~
+
+~~~
+[root@localhost ~]# bash
+#在当前Shell中，还可以再进入一个bash的Shell
+
+#查询当前在哪个shell中，使用pstree
+[root@localhost ~]# pstree
+init─┬─abrtd
+     ├─acpid
+     ├─atd
+     ├─auditd───{auditd}
+     ├─automount───4*[{automount}]
+     ├─certmonger
+     ├─crond
+     ├─cupsd
+     ├─dbus-daemon
+     ├─hald─┬─hald-runner─┬─hald-addon-acpi
+     │      │             ├─hald-addon-inpu
+     │      │             └─hald-addon-rfki
+     │      └─{hald}
+     ├─master─┬─pickup
+     │        └─qmgr
+     ├─mcelog
+     ├─6*[mingetty]
+     ├─rpc.statd
+     ├─rpcbind
+     ├─rsyslogd───3*[{rsyslogd}]
+     ├─sshd───sshd───bash───bash───pstree  #在此量看
+     └─udevd───2*[udevd]
+[root@localhost ~]# exit
+~~~
+
+
+
+3. 系统常见环境变量
+
+- PATH：系统查找命令的路径
+
+~~~
+[root@localhost ~]# echo $PATH
+/usr/lib64/qt-3.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+~~~
+
+- PATH="$PATH":/root/sh   （ PATH变量叠加）
+
+~~~
+[root@localhost ~]# PATH="$PATH":/root/sh
+#PATH变量叠加
+#这种方式也只是临时生效，想长久生效必须写入文件
+~~~
+
+- PS1：定义系统提示符的变量
+
+  - \d： 显示日期，格式为“星期  月  日”
+  - \h： 显示简写主机名。如默认主机名“localhost’”
+  - \t：  显示24小时制时间，格式为“HH:MM:SS”
+  - \T：  显示12小时制时间， 格式为"HH:MM:SS"
+  - \A：  显示24小时制时间， 格式为"HH:MM"
+  - \u：  显示当前用户名
+  - \w：  显示当前所在目录的完整名称
+  - \W： 显示当前所在目录的最后一个目录
+  - \\#：  执行的第几个命令
+  - \\$ ： 提示符。如果是root 用户会显示提示符为"#"，如果是普通用户会显示提示符为“$”
+
+  举例：
+
+  ~~~
+  [root@localhost ~]# PS1='[\u@\t \w]\$'
+  #此方式也只是临时生效，如果想长久生效，则写入配置文件
+  [root@04:50:08 /usr/local/src]# PS1='[\u@\@ \h \#\W]\$'
+  
+  [root@04:53 上午 localhost 31 src]# PS1='[\u@\h \W]\$'
+  
+  ~~~
+
+  
+
+
+
+
+
+
+
+
+
+### 10.4.3 位置参数变量
+
+### 10.4.4 预定义变量
+
+
+
 ## 10.5 Bash的运算符
 ## 10.6 环境变量配置文件
 ```
 
-[root@localhost~]#
-[root@localhost~]#
-[root@localhost~]#
-[root@localhost~]#
-[root@localhost~]#
+[root@localhost ~]#
+[root@localhost ~]#
+[root@localhost ~]#
+[root@localhost ~]#
+[root@localhost ~]#
 
 
 ```
