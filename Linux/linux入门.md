@@ -3356,21 +3356,295 @@ init─┬─abrtd
 
   
 
-
-
-
-
-
-
-
-
 ### 10.4.3 位置参数变量
+
+1. 位置参数变量
+
+| 位置参数变量 | 作用                                                         |
+| ------------ | ------------------------------------------------------------ |
+| $n           | n为数字，$0代表命令本身，$1-$9代表第一到第九个参数，十以上的参数需要用大括号包含，如${10}. |
+| $*           | 这个变量代表命令行中所有的参数，$*把所有的参数成一个整体     |
+| $@           | 这个变量也代表命令行中所有的参数，不过$@把每个参数区分对待   |
+| $#           | 这个变量代表命令行中所有参数的个数                           |
+
+例1：
+
+~~~
+[root@localhost ~]# vim plus.sh
+#!/bin/bash
+num1=$1
+num2=$2
+sum=$(($sum1+$sum2))
+#变量sum的和是sum1加sum2
+echo $sum
+#打印变量sum的值
+
+~~~
+
+~~~
+[root@localhost ~]# chmod 755 plus.sh
+[root@localhost ~]# ./plus.sh 11 22
+33
+#输出33
+~~~
+
+
+
+例2：
+
+~~~
+[root@localhost ~]# vim test.sh
+#!/bin/bash
+echo "A total of $# parameters"
+#使用$#代表所有参数的个数
+echo "The parameters is : $*"
+#使用$*代表所有的参数
+echo "The parameters is: $@"
+#使用$@也代表所有的参数
+
+~~~
+
+~~~
+[root@localhost ~]# chmod 755 test.sh
+[root@localhost ~]# ./test.sh 11 22 33
+A total of 3 parameters
+The parameters is : 11 22 33
+The parameters is: 11 22 33
+
+~~~
+
+例子3: $*与$@的区别
+
+~~~
+[root@localhost ~]# vim test2.sh
+#！/bin/bash
+for i in "$*"
+#$*中的所有参数看成是一个整体，所以这个for循环只会循环一次
+do 
+	echo "The parameters is: $i"
+done
+x=1
+for y in "$@"
+#$@中的每个参数都看成是独立的，所以"$@"中有几个参数，就会循环几次
+do 
+	echo "The parameter$x is: $y"
+	x=$(($x+1))
+done
+~~~
+
+~~~
+[root@bogon sh]# vim test2.sh
+[root@bogon sh]# chmod 755 test2.sh
+[root@bogon sh]# ./test2.sh 11 22 33
+The parameters is: 11 22 33
+The parameter1 is: 11
+The parameter2 is: 22
+The parameter3 is: 33
+
+~~~
+
+
+
+
 
 ### 10.4.4 预定义变量
 
+1. 预定义变量
 
+   | 预定义变量 | 作用                                                         |
+   | ---------- | ------------------------------------------------------------ |
+   | $?         | 最后一次执行的命令的返回状态。如果这个变量的值为0，证明上一个命令正确执行；如果这个变量的值为非0（具体是哪个数，由命令自己来决定），则证明上一个命令执行不正确了。 |
+   | $$         | 当前进程的进程号（PID)                                       |
+   | $!         | 后台运行的最后一个进程 的进程号（PID）                       |
+
+   例：
+
+   ~~~
+   [root@bogon sh]# ls
+   game.sh  hello.sh  plus.sh  test2.sh  test.sh
+   [root@bogon sh]# echo $?
+   0
+   [root@bogon sh]# ldjflksajf
+   -bash: ldjflksajf: command not found
+   [root@bogon sh]# echo $?
+   127
+   [root@bogon sh]# 
+   
+   ~~~
+
+   ~~~
+   #!/bin/bash
+   #Author: axin (E-mail: axin@qq.com)
+   echo "The current process is $$"
+   #输出当前进程的PID
+   #这个PID就是variable.sh这个脚本执行时，生成的进程的PID
+   
+   find /root -name hello.sh &
+   #使用find命令在root目录下查找hello.sh文件
+   #符号&的意思是把命令放入后台执行，工作管理我们在系统管理章节会祥细介绍
+   echo "The last one Daemon process is $!"
+   
+   ~~~
+
+   
+
+   2. 接收键盘输入
+
+   
+
+   ~~~
+   [root@localhost ~]# read [选项] [变量名]
+   选项：
+   	-p "提示信息"： 在等待read输入时，输出提示信息
+   	-t 秒数：  read命令会一直等待用户输入，使用此选项可以指定等待时间
+   	-n 字符数： read命令只接受指定的字符数，就会执行
+   	-s: 隐藏输入的数据，适用于机密信息的输入
+   ~~~
+
+   
+
+   ~~~
+   #！/bin/bash
+   # Author: axin (E-mail: axin@qq.com)
+   read -t 30 -p "Please input your name: " name
+   #提示"请输入姓名"并等待30秒，把用户的输入保存入变量name中
+   echo "Name is $name"
+   
+   read -s -t 30 -p "Please enter your age:" age
+   #年龄是隐私，所以我们用"-s" 选项隐藏输入
+   echo -e "/n"
+   echo "Age is $age"
+   
+   read -n 1 -t 30 -p "Please select your gender[M/F]:" gender
+   #使用 "-n 1"选项只接收一个输入字符就会执行（都不用输入回车）
+   echo -e "/n"
+   echo "Sex is $gender"
+   
+   ~~~
+
+   
+
+   
+
+   
 
 ## 10.5 Bash的运算符
+
+### 10.5.1 数值运算与运算符
+
+1. declare声明变量类型
+
+~~~
+[root@localhost ~]# declare [+/-][选项] 变量名
+选项：
+	-: 给变量设定类型属性
+	+: 取消变量的类型属性
+	-i: 将变量声明为整数型(integer)
+	-x: 将变量声明为环境变量
+	-p: 显示指定变量的被声明的类型
+~~~
+
+~~~
+[root@bogon sh]# aa=11
+[root@bogon sh]# bb=22
+[root@bogon sh]# cc=$aa+$bb
+[root@bogon sh]# echo $cc
+11+22
+#输出为字符串
+[root@bogon sh]# declare -p aa
+declare -- aa="11"
+#查看aa的类型
+[root@bogon sh]# export aa
+#将aa设定为环境变量 ， 使用 -x 也可以，大部分习惯用export命令
+[root@bogon sh]# declare -p aa
+declare -x aa="11"
+
+~~~
+
+2. 数值运算
+
+   方法1：
+
+~~~
+[root@localhost ~]# aa=11
+[root@localhost ~]# bb=22
+#给变量aa和bb赋值
+[root@localhost ~]# declare -i cc=$aa+$bb
+[root@localhost sh]# echo $cc
+33
+
+~~~
+
+ 方法2：expr或let数值运算工具
+
+~~~
+[root@localhost ~]# aa=11
+[root@localhost ~]# bb=22
+#给变量aa和bb赋值
+[root@localhost ~]# dd=$(expr $aa + $bb)
+#dd的值是aa和bb的和。注意 “+” 号左右两侧必须有空格
+#$()代表是命令的结果赋值给dd
+[root@localhost ~]# echo $dd
+33
+
+~~~
+
+方法3： **"$((运算式))"或 "$[运算式]" **
+
+~~~
+[root@localhost ~]# aa=11
+[root@localhost ~]# bb=22
+[root@localhost ~] ff=$(($aa+$bb))
+#$()单括号代表是包括来的是命令  $(())双括号代表包起来的是数值运算 推荐此方法。
+[root@localhost ~] gg=$[$aa+$bb]
+#$[]和$(())结果相同，都可以
+[root@localhost ~]# echo $dd
+33
+[root@localhost ~]# echo $ff
+33
+
+~~~
+
+3. 运算符
+
+   | 优先级 | 运算符                                       | 说明                               |
+   | ------ | -------------------------------------------- | ---------------------------------- |
+   | 13     | -，+                                         | 单目负、单目正                     |
+   | 12     | !、 ~                                        | 逻辑非、按位取反或补码             |
+   | 11     | *， /，%                                     | 乘、除、取模                       |
+   | 10     | +，-                                         | 加、减                             |
+   | 9      | << , >>                                      | 按位左移、按位右移                 |
+   | 8      | < =, >=, <, >                                | 小于或等于、大于或等于、小于、大于 |
+   | 7      | ==， ！=                                     | 等于、不等于                       |
+   | 6      | &                                            | 按位与                             |
+   | 5      | ^                                            | 按位异或                           |
+   | 4      | \|                                           | 按位或                             |
+   | 3      | &&                                           | 逻辑与                             |
+   | 2      | \|\|                                         | 逻辑或                             |
+   | 1      | =, +=, -=, *=, /=, %=, &=, ^=, \|=, <<=, >>= | 赋值、运算且赋值                   |
+
+   ~~~
+   [root@localhost ~]# aa=$(((11+3)*3/2))
+   #$(())用双括号括起来，里面都可以随便算
+   #虽然乘和除的优先级高于加，但是通过小括号可以调整运算优先级
+   
+   [root@localhost ~]# bb=$(( 14%3 ))
+   #14不能被3整除，余数是2
+   
+   [root@localhost ~]# cc=$((1 && 0))
+   #逻辑与运算只有想与的两边都是1，与的结果才是1，否则与的结果是0
+   ~~~
+
+   
+
+
+
+
+
+### 10.5.2 变量测试与内容替换
+
+
+
 ## 10.6 环境变量配置文件
 ```
 
