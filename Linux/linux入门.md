@@ -3826,7 +3826,245 @@ old
   
   ~~~
 
-  
+
+
+
+# 第十一讲 Shell编程
+
+## 11.1 基础正则表达式
+
+1. 正则表达式与通配符
+
+- 正则表达式用来在文件中匹配符合条件的字符串，正则是包含匹配。grep、awk、sed等命令可以支持正则表达式。
+- 通配符用来匹配符合条件的文件名，通配符是完全匹配。ls、find、cp这些命令不支持正则表达式，所以只能使用shell自己的通配符来进行匹配了。
+
+创建test-rule.txt 输入以下内容：用来测试 
+
+~~~
+Mr. Li Ming said:
+he was the honest man in LampBrother.
+123despise him.
+
+But since Mr. shen Chao came.
+he never saaaid those words.
+5555nice!
+
+because,actuaaaally,
+Mr. Shen Chao is the most honest man!
+Later,Mr. Li ming soid his hot body.
+
+~~~
+
+
+
+| 元字符      | 作用                                                         |
+| ----------- | ------------------------------------------------------------ |
+| *           | 前一个字符匹配0次或任意多次。                                |
+| .           | 匹配除了换行符外任意一个字符。                               |
+| ^           | 匹配行首。例如: ^hello会匹配以hello开头的行。                |
+| $           | 匹配行尾。例如hello$会匹配以hello结尾的行。                  |
+| []          | 匹配中括号中指定的任意一个字符，只匹配一个字符。例如：[aoeiu]匹配任意一个元音字母，[0-9]匹配任意一位数字，[a-z]\[0-9]匹配小写字母和一位数字构成的两位字符。 |
+| [^]         | 匹配除中括号的字符以外的任意一个字符。例如：\[^0-9]匹配任意一位非数字字符，\[^a-z]表示任意一位非小写字母。 |
+| \           | 转义符。用于取消讲特殊符号的含义取消。                       |
+| \\\{n\\\}   | 表示其前面的字符恰好出现n次。例如:[0-9]\\{4\\}匹配4位数字，[1]\[3-8\][0-9]\\{9\\} 匹配手机号码。 |
+| \\\{n，\\\} | 表示其前面的字符出现不小于n次。例如[0-9]\\{2,\\}表示两位及以上的数字。 |
+| \\{n,m\\}   | 表示其前面的字符至少出现n次，最多出现m次。例如[a-z]\\{6,8\\}匹配6到8位的小写字母。 |
+
+“*”前一个字符匹配0次，或任意多次
+
+~~~
+[root@localhost ~]# grep "a*" test_rule.txt
+#匹配所有内容，包括空白行
+[root@localhost ~]# grep "aa*" test_rule.txt
+#匹配至少包含有一个a的行	
+[root@localhost ~]# grep "aaa*" test_rule.txt
+#匹配最少包含两个连续a的字符串
+[root@localhost ~]# grep "aaaaa*" test_rule.txt
+#则会匹配最少包含四个连续a的字符串
+~~~
+
+“.”匹配除了换行符外任意一个字符
+
+~~~
+[root@localhost ~]# grep "s..d" test_rule.txt
+#"s..d"会匹配在s和d这两个字母之间一定有两个字符的单词
+[root@localhost ~]# grep "s.*d" test_rule.txt
+#匹配在s和d字母之间有任意字符，或中间没有字符
+[root@localhost ~]# grep ".*" test_rule.txt
+#匹配所有内容
+~~~
+
+“^” 匹配行首，"$"匹配行尾	
+
+~~~
+[root@localhost ~]# grep "^M" test_rule.txt
+#匹配以大写“M”开头的行
+[root@localhost ~]# grep "n$" test_rule.txt
+#匹配以小写“n”结尾的行
+[root@localhost ~]# grep -n "^$" test_rule.txt
+#会匹配空白行， -n：显示行号
+~~~
+
+"[]"匹配中括号中指定的任意一个字符，只匹配一个字符
+
+~~~
+[root@localhost ~]# grep "s[ao]id" test_rule.txt
+#匹配s和i字母中间，要不是a、要不是o
+[root@localhost ~]# grep "[0-9]" test_rule.txt
+#匹配任意一个数字
+[root@localhost ~]# grep "^[a-z]" test_rule.txt
+#匹配用小写字母开头的行
+~~~
+
+"[^]"匹配中括号中的字符以外的任意一个字符
+
+~~~
+[root@localhost ~]# grep "^[^a-z]" test_rule.txt
+#匹配不用小写字母开头的行
+[root@localhost ~]# grep "^[^a-zA-Z]" test_rule.txt
+#匹配不用字母开头的行
+~~~
+
+"\\" 转义符
+
+~~~
+[root@localhost ~]# grep "\.$" test_rule.txt 
+#匹配使用"."结尾的行
+~~~
+
+"\\{n\\}"表示其前面的字符恰 好出现n次
+
+~~~
+[root@localhost ~]# grep "a\{3\}" test_rule.txt
+#匹配a字母连续出现三次的字符串
+[root@localhost ~]# grep "[0-9]\{3\}" test_rule.txt
+#匹配包含连续的三个数字的字符串
+
+~~~
+
+"\\{n，\\}"表示其前面的字符出现不小于n次
+
+~~~
+[root@localhost ~]# grep "^[0-9]\{3,\}[a-z]" test_rule.txt
+#匹配最少用连续三个数字开头的行
+~~~
+
+"\\{n，m\\}"匹配其前面的字符至少出现n次，最多出现m次
+
+~~~
+[root@localhost ~]# grep "sa\{1,3\}i" test_rule.txt
+#匹配在字母s和字母i之间有最少一个a,最多三个a
+~~~
+
+
+
+## 11.2 字符截取命令
+
+### 11.2.1 cut字段提取命令
+
+新建一个文件 student.txt ,填入以下内容，用于测试命令：
+
+~~~
+ID		Name		gender		Mark
+1		Liming		M			86
+2		Sc			M			90
+3		Gao			M			83
+#列与列中间用制表符分隔（Tab）
+~~~
+
+
+
+~~~
+[root@localhost ~]# cut [选项] 文件名
+选项：
+	-f 列号：	提取第几列
+	-d 分隔符： 按照指定分隔符分割列
+~~~
+
+
+
+~~~
+[root@localhost ~]# cut -f 2 student.txt
+
+[root@localhost ~]# cut -f 2,3 student.txt
+
+[root@localhost ~]# cut -d ":"  -f 1,3 /etc/passwd
+#提取文件中以：进行分隔的列
+~~~
+
+cut命令的局限
+
+~~~
+[root@localhost ~]# df -h | cut -d " " -f 1,3
+#df：查看分区的命用状态
+[root@localhost ~]# df -h | grep "sda5" | cut -d " " -f 1,3
+#无效，必须是使用制表符分隔或者有规则的分隔符号的文件
+~~~
+
+### 11.2.2 printf命令
+
+~~~
+[root@localhost ~]# printf '输出类型输出格式' 输出内容
+
+输出类型：
+
+	%ns:	输出字符串。n是数字指代输出几个字符
+
+	%ni:	输出整数。n是数字指代输出几个数字
+
+	%m.nf:	输出浮点数。m和n是数字，指代输出的整数位数和小数位数。如%8.2f代表共输			  出8位数，其中2位是小数，6位是整数。
+输出格式：
+	\a:		输出警告声音
+	\b:		输出退格键，也就是Backspace键
+	\f:		清除屏幕
+	\n:		换行
+	\r:		回车，也就是Enter键
+	\t:		水平输出退格键，也就是Tab键
+	\v:		垂直输出退格键，也就是Tab键
+~~~
+
+例：
+
+~~~
+[root@localhost ~]# printf %s 1 2 3 4 5 6
+[root@localhost ~]# printf %s %s %s 1 2 3 4 5 6
+#无效，需加单引号
+[root@localhost ~]# printf '%s %s %s' 1 2 3 4 5 6
+#三个%s代表三个字符输出一个字符串
+
+[root@localhost ~]# printf '%s %s %s\n' 1 2 3 4 5 6
+~~~
+
+~~~
+[root@localhost ~]# printf '%s' $(cat student.txt)
+#printf文件内容
+~~~
+
+~~~
+[root@localhost ~]# printf '%s\t %s\t %s\t %s\n ' $(cat student.txt)
+#按格式输出student.txt文件
+~~~
+
+在awk命令的输出中支持print和printf命令
+
+- print: print会在每个输出之后自动加入一个换行符（Linux默认没有print命令，只能在awk中使用）
+- printf: printf是标准格式输出命令，并不会自动加入换行符，如果需要换行，需要手工加入换行符
+
+
+
+### 11.2.3 awk命令
+
+### 11.2.4 sed命令
+
+
+
+## 11.3 字符处理命令
+
+## 11.4 条件判断
+
+## 11.5 流程控制
+
+
 
 ```
 
