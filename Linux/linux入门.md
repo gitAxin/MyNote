@@ -3341,7 +3341,7 @@ init─┬─abrtd
   - \w：  显示当前所在目录的完整名称
   - \W： 显示当前所在目录的最后一个目录
   - \\#：  执行的第几个命令
-  - \\$ ： 提示符。如果是root 用户会显示提示符为"#"，如果是普通用户会显示提示符为“$”
+  - \\\$ ： 提示符。如果是root 用户会显示提示符为"#"，如果是普通用户会显示提示符为“$”
 
   举例：
 
@@ -4054,17 +4054,535 @@ cut命令的局限
 
 ### 11.2.3 awk命令
 
+~~~
+[root@localhost ~]# awk '条件1 ｛动作1｝ 条件2{动作2}...' 文件名
+条件(Pattern):
+	一般使用关系表达式作为条件
+	x>10	判断变量x是否大于10
+	x>=10	大于等于
+	x<=10	小于等于
+动作(Action)：
+	格式化输出
+	流程控制语句
+
+~~~
+
+例：
+
+~~~
+[root@localhost ~]# awk '{printf $2 "\t" $4"\n"}' student.txt
+#$2代表第2列  $4代表第4列
+#printf：不会加入换行符，所以在最后加一个转义符\n
+
+Name		Mark
+Liming		86
+Sc			90
+Gao			83
+
+~~~
+
+例：处理文件内容是以空格分隔的文件
+
+~~~
+[root@localhost ~]# df -h | awk '{print $1"\t" $5"\t" $6""}' 
+#print会在后面自动加入换行符，所以在print中不用加转义符\n,也可以换行输出
+Filesystem	Use%	Mounted
+/dev/sda5	17%		/
+tmpfs		0%		/dev/shm
+/dev/sda1	20%		/boot	
+/dev/sda2	1%		/home
+/dev/sdb1	1%		/disk1
+
+~~~
+
+例：获取/dev/sda5分区的使用百分比
+
+~~~
+[root@localhost ~]# df -h | grep sda5
+/dev/sda5        17G  2.7G   13G  17% /
+[root@localhost ~]# df -h | grep sda5 | awk '{print $5}'
+17%
+[root@localhost ~]# df -h | grep sda5 | awk '{print $5}' | cut -d "%" -f 1
+17
+
+~~~
+
+- BEGIN
+
+~~~
+[root@localhost ~]# awk 'BEGIN{printf "This is a transcript \n"} {printf $2 "\t" $4 "\n"}' student.txt
+# 在执行{printf $2 "\t" $6 "\n"}之前，会先执行BEGIN {printf "This is a transcript \n"} ,输出一句话后再执行{printf $2 "\t" $6 "\n"}
+#注：BEGIN后面无空格
+
+~~~
+
+- FS内置变量(作用：指定分隔符)
+
+~~~
+[root@localhost ~]# cat /etc/passwd | grep "/bin/bash" | awk '{FS=":"} {printf $1 "\t" $3 "\n"}'
+root:x:0:0:root:/root:/bin/bash	
+linzhiling	500
+yangmi	501
+bimm	502
+cangls	503
+st	504
+
+#awk默认分隔会是制表格或空格，但是passwd分隔符是“：”，所以需要指定分隔符
+输出结果发现第一行没有显示预期的结果，是因为awk命令是一行一行的读然后输出，在此命令中系统先是读取一行，然后再指定FS变量，再使用FS指定的分隔符输出。加上BEGIN后，可在执行之前先指定FS变量，再读第一行的时候就已经按“：”进行分隔了。效果如下：
+[root@localhost ~]# cat /etc/passwd | grep "/bin/bash" | awk 'BEGIN{FS=":"} {printf $1 "\t" $3 "\n"}'
+root	0
+linzhiling	500
+yangmi	501
+bimm	502
+cangls	503
+st	504
+#所以，如果要指定分隔符，就一定要使用BEGIN关键字
+
+~~~
+
+
+
+- END(所有命令执行完成后，再执行一关键字END后面的命令)
+
+~~~
+[root@localhost ~]# awk 'END{printf "The End \n"} {printf $2 "\t" $4 "\n"}' student.txt
+
+~~~
+
+- 关系运算符
+
+~~~
+[root@localhost ~]# cat student.txt | grep -v Name | awk '$4 >=87' {printf $2 "\n"}'
+~~~
+
+
+
 ### 11.2.4 sed命令
+
+- sed命令
+
+  - sed是一种几乎包括在所有UNIX平台（包括Linux）的轻量级流编辑器。sed主要是用来将数据进行选取、替换、删除、新增的命令。
+
+  ~~~
+  [root@localhost ~]# sed [选项] ‘[动作]’ 文件名
+  选项：
+  	-n: 一般sed命令会把所有数据都输出到屏幕，如果加入此选择，则只会把经过sed命令处理的行输出到屏幕 。
+  	-e: 允许对输入数据应用多条sed命令编辑
+  	-i: 用sed的修改结果直接修改读取数据的文件，而不是由屏幕输出。
+  动作：
+  	a\: 追加，在当前行后添加一行或多行。添加多行时，除最后一行外，每行末尾需要用"\"代表数据未完结。
+  	c\: 行替换，用c后面的字符串替换原数据行，替换多行时，除最后一行外，每行末尾需用“\”代表数据未完结。
+  	i\: 插入，在当前行前插入一行或多行。插入多行时，除最后一行外，每行末尾需要用"\"代表数据未完结。
+  	d:	删除，删除指定的行。
+  	p:	打印，输出指定的行。
+  	s:	字串替换，用一个字符串替换另外一个字符串。格式为"行范转s/旧字串/新字串/g" (和vim中的替换格式类似)。
+  ~~~
+
+~~~
+[root@localhost ~]# sed '2p' student.txt
+#查看文件的第二行
+
+[root@localhost ~]# sed -n '2p' student.txt
+#加上-n只输出第2行
+
+[root@localhost ~]# df -h | sed -n '2p'
+#可接收命令的结果进行处理
+
+[root@localhost ~]# sed '2,3d' student.txt
+#删除第2行到第3行，只删除输出的结果，文件内容本身不会删除，（除非加-i选项）
+
+[root@localhost ~]# sed '2a hello' student.txt
+#在第二行后追加hello
+
+[root@localhost ~]# sed '2i hello \
+world' student.txt
+#在第二行前插入两行数据
+# \代表多行时，用来每行之间的分隔
+
+[root@localhost ~]# sed '2c No such person' student.txt
+#整行数据替换
+~~~
+
+字符串替换：
+
+~~~
+[root@localhost ~]# sed 's/旧字符串/新字符串/g' 文件名
+
+[root@localhost ~]# sed '3s/74/99/g' student.txt
+#在第三行中，把74换成99
+ 
+[root@localhost ~]# sed -i '3s/74/99/g' student.txt
+ #sed操作的数据直接写入文件
+ 
+[root@localhost ~]# sed -e 's/Liming//g; s/Gao//g' student.txt
+ #同时把“Liming” 和"Gao" 替换为空
+~~~
 
 
 
 ## 11.3 字符处理命令
 
+1. 排序命令sort
+
+~~~
+[root@localhost ~]# sort [选项] 文件名
+选项：
+	-f: 忽略大小写
+	-n: 以数值型进行排序，默认使用字符串型排序
+	-r: 反向排序
+	-t: 指定分隔符，默认分隔符是制表符
+	-k n[,m] ： 按照指定的字段范围排序。从第n字段开始，m字段结束（默认到行尾）
+~~~
+
+~~~
+[root@localhost ~]# sort /etc/passwd
+#排序用户信息文件
+
+[root@localhost ~]# sort -r /etc/passwd
+#反向排序
+~~~
+
+~~~
+[root@localhost ~]# sort -t ":" -k 3,3 /etc/passwd
+#指定分隔符是":", 用第三字段开头，第三字段结尾排序，就是只用第三字段排序
+
+[root@localhost ~]# sort -n -t ":" -k 3,3 /etc/passwd
+~~~
+
+
+
+2. 统计命令wc
+
+~~~
+[root@localhost ~]# wc [选项] 文件名
+选项：
+	 -l: 只统计行数
+	 -w: 只统计单词数
+	 -m: 只统计字符数
+~~~
+
+
+
 ## 11.4 条件判断
+
+1. 按照文件类型进行判断
+
+| 测试选项    | 作用                                                         |
+| ----------- | ------------------------------------------------------------ |
+| -b 文件     | 判断该文件是否存在，并且是否为块设备文件(是块设备文件为真)   |
+| -c 文件     | 判断该文件是否存在，并且是否为字符设备文件(是字符设备文件为真) |
+| **-d 文件** | **判断该文件是否存在，并且是否为目录文件(是目录为真)**       |
+| **-e 文件** | **判断该文件是否存在，(存在为真)**                           |
+| **-f 文件** | **判断该文件是否存在，并且是否为普通文件（是普通文件为真）** |
+| -L 文件     | 判断该文件是否存在，并且是否为符号链接文件(是符号链接文件为真) |
+| -p 文件     | 判断该文件是否存在，并且是否为管道文件(是管道文件为真)       |
+| -s 文件     | 判断该文件是否存在，并且是否为非空（非空为真）               |
+| -S 文件     | 判断该文件是否存在，并且是否为套接字文件（是套接字文件为真） |
+
+两种判断格式：
+
+~~~
+[root@localhost ~]# test -e /root/install.log
+或
+[root@localhost ~]# [ -e /root/install.log ]   （此格式在脚本中常用）
+#[ 两边内部必须有空格 ]
+
+[root@localhost ~]# $?
+#判断上条命令是否正确 输出0 代表正确  输出1 代表不正确
+~~~
+
+以上命令中执行完成后，还必须输入$?来查看结果，为了方便，可以使用以下命令：
+
+~~~
+[root@localhost ~]# [ -d /root ] && echo "yes" || echo "no"
+#第一个判断命令如果正确执行，则打印"yes"， 否则打印“no”
+~~~
+
+2. 按照文件权限进行判断
+
+   | 测试选项    | 作用                                                         |
+   | ----------- | ------------------------------------------------------------ |
+   | **-r 文件** | **判断该文件是否存在，并且是否该文件拥有读权限（有读权限为真）** |
+   | **-w 文件** | **判断该文件是否存在，并且是否该文件拥有写权限（有写权限为真）** |
+   | **-x 文件** | **判断该文件是否存在，并且是否该文件拥有执行权限 (有判断权限为真)** |
+   | -u 文件     | 判断该文件是否存在，并且是否该文件拥有SUID权限(有SUID权限为真) |
+   | -g 文件     | 判断该文件是否存在，并且是否该文件拥有SGID权限(有SGID权限为真) |
+   | -k 文件     | 判断该文件是否存在，并且是否该文件拥有SBit权限(有SBit权限为真) |
+
+
+
+~~~
+[root@localhost ~]# [ -w /root/student.txt ] && echo yes || echo no
+#只能判断是否有写权限，但是不能判断什么身份的用户具有写权限
+~~~
+
+3. 两个文件之间进行比较
+
+| 测试选项        | 作用                                                         |
+| --------------- | ------------------------------------------------------------ |
+| 文件1 -nt 文件2 | 判断文件1的修改时间是否比文件2的新(如果新则为真)             |
+| 文件1 -ot 文件2 | 判断文件1的修改时间是否比文件2的旧（如果旧则为真）           |
+| 文件1 -ef 文件2 | 判断文件1是否和文件2的Inode号一致，可以理解为两个文件是否为同一个文件。这个判断用于判断硬链接是很好的方法 |
+
+~~~
+[root@localhost ~]# ln /root/student.txt /tmp/stu.txt
+#创建个硬链接
+
+[root@localhost ~]# [ /root/student.txt -ef /tmp/stu.txt ] && echo "yes" || echo "no"
+yes
+#用test测试下，显示结果为同一个文件
+#注：硬链接，使用ll 命令查询，除了文件名看不出有什么区别，无法区分是不是同一个文件，虽然使用ll -i命令 可以查看Inode节点号，节点号显示一致，但是不易使用，使用此命令可以很简单的判断
+~~~
+
+4. 两个整数之间比较
+
+| 测试选项         | 作用                                       |
+| ---------------- | ------------------------------------------ |
+| 整数1 -eq 整数2  | 判断整数1是否和整数2相等(相等为真)         |
+| 整数1 -ne 整数2  | 判断整数1是否和整数2不相等（不相等为真）   |
+| 整数1 -gt 整数2  | 判断整数1是否大于整数2(大于为真)           |
+| 整数1 -lt 整数2  | 判断整数1是否小于整数2（小于为真）         |
+| 整数1 -ge  整数2 | 判断整数1是否大于等于整数2（大于等于为真） |
+| 整数1 -le 整数2  | 判断整数1是否小于等于整数2(小于等于为真)   |
+
+~~~
+[root@localhost ~]# [ 23 -ge 22 ] && echo "yes" || echo "no"
+yes
+#判断23是否大于等于22,当然是了
+
+[root@localhost ~]# [ 23 -le 22 ] && echo "yes" || echo "no"
+no
+#判断23是否小于等于22,当然不是了
+~~~
+
+5. 字符串的判断
+
+| 测试选项        | 作用                                           |
+| --------------- | ---------------------------------------------- |
+| -z 字符串       | 判断字符串是否为空（为空返回真）               |
+| -n 字符串       | 判断字符串是否为非空（非空返回真）             |
+| 字串1 == 字串2  | 判断字符串1是否和字符串2相等（相等返回真）     |
+| 字串1 ！= 字串2 | 判断字符串1是否和字符串2不相等（不相等返回真） |
+
+~~~
+[root@localhost ~]# name=sc
+#给name=变量赋值
+[root@localhost ~]# [ -z "$name" ] && echo "yes" || echo "no"
+no
+#判断name变量是否为空，因为不为空，所以返回no
+~~~
+
+~~~
+[root@localhost ~]# aa=11
+[root@localhost ~]# bb=22
+#给变量aa和变量bb赋值
+[root@localhost ~]# [ "$aa" == "bb" ] && echo "yes" || echo "no"
+no
+#判断两个变量的值是否相等，明显不相等，所以返回no
+
+~~~
+
+6. 多重条件判断
+
+| 测试选项       | 作用                                             |
+| -------------- | ------------------------------------------------ |
+| 判断1 -a 判断2 | 逻辑与，判断1和判断2都成立，最终的结果才为真     |
+| 判断1 -o 判断2 | 逻辑或，判断1和判断2有一个成立，最终的结果就为真 |
+| ！判断         | 逻辑非，使原始的判断式取反                       |
+
+~~~
+[root@localhost ~]# aa=11
+[root@localhost ~]# [ -n "$aa" -a "$aa -gt 23" ] && echo "yes" || echo "no"
+no
+#判断变量aa是否有值，同时判断变量aa的值是否大于23
+#因为变量aa的值不大于23,所以虽然第一个判断值为真，返回的结果也是假
+
+[root@localhost ~]# aa=24
+[root@localhost ~]# [ -n "$aa" -a "$aa" -gt 23 ] && echo "yes" || echo "no"
+yes
+
+~~~
+
+
 
 ## 11.5 流程控制
 
+### 11.5.1 if语句
 
+1. 单分支if条件语句
+
+~~~
+if [ 条件判断式 ];then
+	程序
+fi
+或者
+if [ 条件判断式 ]
+	then
+		程序
+fi
+# [ 两边需要有空格 ]
+~~~
+
+> **单分支条件语句需要注意几个点**
+>
+> - if语句使用fi结尾，和一般语言使用大括号结尾不同
+> - [ 条件判断式 ] 就是使用test命令判断，所以中括号和条件判断式之间必须有空格
+> - then后面跟符合条件之后执行的程序，可以放在[ ]之后，用“；”分割。也可以换行写入，就不需要"； "了
+
+
+
+例子：判断分区使用率
+
+~~~
+#!/bin/bash
+#统计根分区使用率
+#Author : axin
+rate=$(df -h | grep "/dev/sda3" | awk '{print $5}' | cut -d "%" -f1)
+#把根分区使用率作为变量值赋予变量rate
+if [ $rate -ge 80 ]
+	then
+		echo "Warning ! /dev/sda3 is full!!"
+fi
+~~~
+
+2. 双分支if条件语句
+
+   ~~~
+   if [ 条件判断式 ]
+   	then
+   		条件成立时，执行的程序
+   	else
+   		条件不成立时，执行的另一个程序
+   fi
+   # [ 两边需要有空格 ]
+   ~~~
+
+   例子1：备份mysql数据库
+
+   ~~~
+   #!/bin/bash
+   #备份mysql数据库。
+   #Author: axin
+   ntpdate asia.pool.ntp.org &>/dev/null
+   #同步系统时间（让linux时间与网上亚州服务器asia.pool.ntp.org时间一致）
+   date=$(date +%y%m%d)
+   #把当前系统时间按照"年月日"格式赋予变量date
+   size=$(du -sh /var/lib/mysql)
+   #统计mysql数据库的大小，并把大小赋予size变量
+   #/var/lib/mysql ： mysql的rpm包默认安装位置
+   #如果是源码包一般都会安装在指定位置 /user/local/mysql
+   
+   if [ -d /tmp/dbbak ]
+   	then
+   		echo "Date: $date!" > /tmp/dbbak/dbinfo.txt
+   		echo "Data size: $size" >> /tmp/dbbak/dbinfo.txt
+   		cd /tmp/dbbak
+   		tar -zcf mysql-lib-$date.tar.gz /var/lib/mysql dbinfo.txt &>/dev/null
+   		rm -rf /tmp/dbbak/dbinfo.txt
+   	else
+   		mkdir /tmp/dbbak
+   		echo "Date: $date!" > /tmp/dbbak/dbinfo.txt
+   		echo "Data size: $size" >> /tmp/dbbak/dbinfo.txt
+   		cd /tmp/dbbak
+   		tar -zcf mysql-lib-$date.tar.gz /var/lib/mysql dbinfo.txt & >/dev/null
+   		rm -rf /tmp/dbbak/dbinfo.txt
+   fi
+   ~~~
+
+   ~~~
+   [root@localhost ~]# date +%y%m%d
+   #date时间只显示年月日
+   180603
+   ~~~
+
+   例子2：判断apache是否启动
+
+   > 需要安装nmap命令，可以使用yum进行安装
+   >
+   > ~~~
+   > nmap -sT  192.168.0.120(要检查的ip地址，此处指本机ip地址)
+   > #-sT扫描指定服务器上开放的tcp端口
+   > ~~~
+   >
+
+   ~~~
+   #！/bin/bash
+   #Author: axin
+   port=$(nmap -sT 192.168.0.120 | grep tcp | grep http | awk '{print $2}')
+   #使用nmap命令扫描服务器，并截取apache服务的状态，赋予变量port
+   if [ "$port" == "open" ]
+   	then
+   		echo "$(date) httpd is ok!" >> /tmp/autostart-acc.log
+   	else
+   		/etc/rc.d/init.d/httpd start &>/dev/null
+   		echo "$(date) restart httpd !!" >> /tmp/autostart-err.log
+   fi
+   ~~~
+
+   ~~~
+   [root@localhost ~]# service httpd start
+   #重启apache
+   [root@localhost ~]# service httpd stop
+   #停止apache
+   [root@localhost ~]# service httpd restart
+   #重启apache
+   ~~~
+
+
+
+3. 多分支if条件语句
+
+   ~~~
+   if [ 条件判断式1 ]
+   	then
+   		当条件判断式1成立时，执行程序1
+   elif [ 条件判断式2 ]
+   	then
+   		当条件判断式2成立时，执行程序2
+   ...省略更多条件...
+   else
+   	当所有样件都不成立时，最后执行此程序
+   fi
+   ~~~
+
+   例子：判断用户输入的是什么 文件
+
+   ~~~
+   #！/bin/bash
+   #判断用户输入的是什么文件
+   #Author : axin
+   read -p "please input a filename: " file
+   #接收键盘的输入，并赋予变量file
+   if [ -z "$file" ]
+   #判断file变量是否为空
+   	then
+   		echo "Error, please input a filename"
+   		exit 1 (#此exit 1 执行后退出程序 ，可用$?查看结果，一量不写exit 1 程序还会往下执行)
+   elif [ ! -e "$file" ]
+   #判断file的值是否存在
+   	then
+   		echo "Your input is not a file!"
+   		exit 2
+   elif [ -f "$file" ]
+   #判断file的值是否为普通文件
+    	then
+    		echo "$file is a regulare file!"
+    elif [ -d "$file"]
+    #判断file的值是否为目录文件
+    	then 
+    		echo "$file is a directory!"
+    else
+    		echo "$file is an other file!" 
+    fi
+   ~~~
+
+   
+
+### 11.5.2 case语句
+
+### 11.5.3 for循环
+
+### 11.5.4 while循环
 
 ```
 
