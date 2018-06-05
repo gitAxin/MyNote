@@ -4580,9 +4580,205 @@ fi
 
 ### 11.5.2 case语句
 
+- 多分支case条件语句
+
+  - case语句 和 if...elif...else语句一样都是多分支条件语句，不过和if多分支条件语句不同的是，case语句只能判断一种条件关系，而if语句可以判断多种条件关系。
+
+  ~~~
+  case $变量名 in
+  	"值1"）
+  		如果变量的值等于值1，则执行程序1
+  		;;
+  	"值2"）
+  		如果变量的值等于值2，则执行程序2
+  		;;
+  	... 省略其他分支...
+  	*）
+  		如果变量的值都不是以上的值，则执行此程序
+  		;;
+  esac
+  	
+  ~~~
+
+  例：
+
+  ~~~
+  #!/bin/bash
+  #判断用户输入
+  # Author: axin
+  read -p "Please choose yes/no:" -t 30 cho
+  case $cho in
+  	"yes")
+  		echo "Your choose is yes!"
+  		;;
+  	"no")
+  		echo "Your choose is no!"
+  		;;
+  	*)
+  		echo "Your choose is error!"
+  		;;
+  esac
+  ~~~
+
+  
+
 ### 11.5.3 for循环
 
-### 11.5.4 while循环
+- 语法一
+
+  ~~~
+  for 变量 in 值1 值2 值3
+  	do
+  		程序
+  	done
+  ~~~
+
+  例子：打印时间
+
+  ~~~
+  #!/bin/bash
+  #打印时间
+  #Author: axin
+  for time in morning noon afternoon evening
+  	do
+  		echo "This time is $time!"
+  	done
+  #变量之间以空格分隔
+  ~~~
+
+  
+
+  例子2：批量解压缩脚本
+
+  ~~~
+  #！/bin/bash
+  #批量解压缩脚本
+  # Author:axin
+  cd /lamp
+  ls *.tar.gz> ls.log
+  #将所有压缩包名称写入到ls.log
+  for i in $(cat ls.log)
+  #查看ls.log文件，内容是一行一行的，每一行都是一个解压包名，for循环是以换行符或空格，只要是隔开的，就循环一次。
+  	do
+  		tar -zxf $i &>/dev/null
+  	done
+  rm -rf /lamp/ls.log
+  
+  ~~~
+
+
+
+- 语法二(知道循环次数)
+
+  ~~~
+  for ((初始值；循环控制条件；变量变化))
+  	do
+  		程序
+  	done
+  ~~~
+
+  例子：从1加到100
+
+  ~~~
+  #！/bin/bash
+  #从1加到100
+  #Author: axin
+  s=0
+  for((i=1;i<=100;i=i+1))
+  	do
+  		s=$(($s+i$))
+  	done
+  echo "The sum of 1+2+...+100 is :$s"
+  ~~~
+
+  例子：批量添加指定数量的用户
+
+  ~~~
+  #!/bin/bash
+  #批量添加指定数量的用户
+  # Author: axin
+  read -p "Please input user name:" -t 30 name
+  read -p "Please input the number of users:" -t 30 num
+  read -p "Please input the password of users:" -t 30 pass
+  if [ ! -z "$name" -a ! -z "$num" -a ! -z "$pass" ]
+  	then
+  	y=$(echo $num | sed 's/[0-9]//g')
+  		if [ -z "$y" ]
+  			then
+  			for((i=1;i<=$num;i=i+1))
+  				do
+  					/usr/sbin/useradd "$name$i" &>/dev/null
+  					echo $pass | /usr/bin/passwd --stdin "$name$i" &> /dev/null
+  					done
+  		fi
+  fi
+  			
+  ~~~
+
+  
+
+### 11.5.4 while循环与until循环
+
+1. while循环
+
+- while循环是不定循环，也称作条件循环。只要条件判断式成立，循环就会一直继续，直到条件判断式不成式，循环才会停止。这就和for的固定循环不太一样了。
+
+  ~~~
+  while [ 条件判断式 ]
+  	do
+  		程序
+  	done
+  ~~~
+
+  例子：从1累加到100。
+
+  ~~~
+  #!/bin/bash
+  #从1累加到100
+  # Author: axin
+  i=1
+  s=0
+  while [ $i -le 100 ]
+  #如果变量i的值小于等于100，则执行循环
+  	do
+  		s=$(($s+$i))
+  		i=$(($i+1))
+  	done
+  echo "The sum is: $s"
+  
+  ~~~
+
+
+
+2. until循环
+
+- until循环，和while循环相反，until循环时只要条件判断式不成立则进行循环，并执行循环程序。一旦循环条件成立，则终止循环。
+
+  ~~~
+  until [ 条件判断式 ]
+  	do
+  		程序
+  	done
+  ~~~
+
+  例子：从1累加到100。
+
+  ~~~
+  #!/bin/bash
+  #从1加到100
+  #Author: axin
+  i=1
+  s=0
+  until [ $i -gt 100 ]
+  #循环直到变量i的值大于100，就停止循环
+  	do
+  		s=$(( $s+$i ))
+  		i=$(( $i+1 ))
+  	done
+  echo "The sum is: $s"
+  ~~~
+
+  
 
 ```
 
