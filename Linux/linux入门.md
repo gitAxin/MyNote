@@ -4855,6 +4855,143 @@ fi
 
 ## 12.2 RPM包安装服务的管理
 
+### 12.2.1 独立服务的管理
+
+![](/../linux入门.assets/2018-06-05_086.png)
+
+1. RPM包安装服务的位置
+
+   - RPM安装服务和源码包安装服务的区别就是安装位置的不同
+
+     -  源码包安装在指定位置，一般是/usr/local/
+     - RPM包安装在默认位置中
+
+     >- /etc/init.d/（此目录为/etc/rc.d/init.d/ 的软链接）:启动脚本位置 （独立服务）
+     >- /etc/sysconfig/:初始化环境配置文件位置
+     >- /etc/:配置文件位置
+     >- /etc/xinetd.conf: xinetd配置文件
+     >- /etc/xinetd.d/: 基于xinetd服务的启动脚本
+     >- /var/lib/:服务产生的数据放在这里 （如果mysql使用的是RPM包安装的，则mysql的库默认放在此位置下mysql目录下）
+     >- /var/log/: 日志
+     >- /var/www/html/：RPM包安装的apache，会将此目录作为网页的保存目录。
+
+     这些目录都是约定俗成的。
+
+2. 独立服务的启动
+
+   - 方法1:
+
+   ~~~
+   [root@localhost ~]# /etc/init.d/独立服务名 start|stop|status|restart
+   或
+   [root@localhost ~]# /etc/rc.d/init.d/独立服务名 start|stop|status|restart
+   #因为/etc/init.d/目录为/etc/rc.d/init.d/ 的软链接
+   ~~~
+
+   - 方法2：
+
+   ~~~
+   [root@localhost ~]# service 独立服务名 start|stop|status|restart
+   #注意：service是红帽子专有命令，Linux系统分为Ubantu系列和红帽子系列，这条命令是红帽子专门开发的简化命令。
+   ~~~
+
+   - 查询所有RPM包安装的服务的状态
+
+   ~~~
+   [root@localhost ~]# service --status-all
+   #作用是会列出系统当中所有RPM包安装的服务的状态
+   ~~~
+
+3. 独立服务的自启动
+
+   - 方法1：
+
+   ~~~
+   [root@localhost ~]# chkconfig --list 
+   #是查询
+   
+   [root@localhost ~]# chkconfig [--level 运行级别] [独立服务名] [on|off]
+   #是修改
+   ~~~
+
+   例：修改apache自启动
+
+   ~~~
+   [root@localhost ~]# chkconfig --level 2345 httpd on
+   #虽然4是未分配，但是一般我们都习惯来指定2345级别。
+   #执行完成后并未启动服务，只能只证下次启动之后来启动
+   
+   [root@localhost ~]# chkconfig httpd on
+   #运行级别默认是2345，所以 --level 2345 可以省略，执行结果和上面相同。
+   
+   ~~~
+
+   
+
+   级别表：
+
+   | 数字 | 含义                      |
+   | ---- | ------------------------- |
+   | 0    | 关机                      |
+   | 1    | 单用户                    |
+   | 2    | 不完全多用户，不含NFS服务 |
+   | 3    | 完全多用户                |
+   | 4    | 未分配                    |
+   | 5    | 图形界面                  |
+   | 6    | 重启                      |
+
+   - 方法2：
+
+   ~~~
+   [root@localhost ~]# 修改/etc/rc.d/rc.local文件
+   #或修改/etc/rc.local文件 （/etc/rc.local文件是/etc/rc.d/rc.local文件的软链接，修改哪一个都可以）
+   
+   
+   ~~~
+
+   > 备注:/etc/rc.d/rc.local文件在系统启动之前都会执行这个文件，所以说，如果把服务启动的标准命令如：
+   >
+   > /etc/init.d/httpd start 写在这个文件中，下次计算机一旦重启，开机时，就会执行此命令，可以实现启动服务的行为。
+
+   例：
+
+   ~~~
+   [root@localhost ~]# 修改/etc/rc.d/rc.local文件
+     1 #!/bin/sh
+     2 #
+     3 # This script will be executed *after* all the other init scripts.
+     4 # You can put your own initialization stuff in here if you don't
+     5 # want to do the full Sys V style init stuff.
+     6 
+     7 touch /var/lock/subsys/local
+     8 #touch 真实的含义并不是创建文件，而是触动的意思，如果有这个文件则修改一下这个文件的最后修改时间，如果没有，则会创建这个文件。在这里写入此命令系统会每次开机执行此文件时，执行到此命令，都会修改此文件的最后修改时间。这样我们就可以查询此文件的最后修改时间，就可以得知系统最近什么时间重启过。
+     9 /etc/init.d/httpd start
+     10 #添加/etc/init.d/httpd start此命令，开机时就会执行此文件，执行时就会执行此命令，实现开机自启动服务的目的。
+   
+   ~~~
+
+   - 方法3：
+
+     - 使用ntsysv命令管理自启动
+
+       ~~~
+       [root@localhost ~]# ntsysv
+       ~~~
+
+       >  此命令是一个图形界面显示的。就像setup命令，想让哪个服务自启动，就在哪个命令前加上*号就可以了。此命令还有一个好处，不仅可以管理独立服务，也可以管理基于xinetd服务。但是不能管理源码包安装的服务。源码包安装的服务，不支持service 、 chkconfig、和ntsysv命令
+       >
+       > 注意：此命令同样是红帽子专有命令，在其他Linux系统中不一定有这条命令。
+
+     
+
+> 推荐使用方法2：如果一个团队都使用此命令，每次都查看这个文件就可以得知有哪些服务在开机时就自启动了。这样可以避免如一个人安装了RPM包的httpd，使用了chkconfig命令进行管理了自启动，又有另一个人安装了源码包的httpd，使用了方法2，修改/etc/rc.d/rc.local文件的方法。在系统启动时，会报错，因为有两个服务占用了同样的端口。
+
+### 12.2.2 基于xinetd服务的管理
+
+略.未找到资源
+
+
+
 ## 12.3 源码包安装服务的管理
 
 ## 12.4 服务管理总结
