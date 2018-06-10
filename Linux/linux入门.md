@@ -6,43 +6,349 @@ typora-root-url: img
 
 视频网址：http://www.iqiyi.com/playlist276124702.html
 
-# 一、linux分区：
+# 第一讲 Linux系统简介
 
-## 1.硬盘接口
-### 1.1:ide:133m/s    sha、 shb
-### 1.2: scaii 200m/s sata 500m/s  sda、sdb
-## 2:分区-格式化-分隔设备名称-挂载点
-## 3：
-## 4：挂载
-```
-必须分区 
- / 根分区 
- swap（交换分区） 2000
- 推荐分区：/boot 启动分区 200
-总结 ：
-分区：把大硬盘分为小的逻辑分区
-格式化 写入文件系统
-分区设置文件名：给每个分区定义设备文件名
-挂载：给每个分区分配挂载点
+## 1.1 UNIX与Linux发展史
 
-复杂性  大小写字母，数字 符号 三种以上
-易记记性
-时效性3个月 最长180天
-```
+> ​	1965年，美国麻省理工学院（MIT）、通用电气公司（GE）及AT&T的贝尔实验室联合开发Multics工程计划，其目标是开发一种交互式的具有多道程序处理能力的分时操作系统，但因Multics追求的目标过于庞大复杂，项目进度远远落后于计划，最后贝尔实验室宣布退出。
 
-## 5. root下的目录：
+> ​	1969年，美国贝尔实验室的肯*汤普森在DEC PDP-7机器上开发出了UNIX系统。
 
+> ​	1971年，肯*汤普森的同事丹尼斯\*里奇发明了C语言；1973年，UNIX系统的绝大部分源代码用C语言重写，这为提高UNIX系统的可移植性打下基础。
+
+UNIX主要发行版本
+
+| 操作系统 | 公司                                      | 硬件平台                       |
+| -------- | ----------------------------------------- | ------------------------------ |
+| AIX      | IBM                                       | PowerPC                        |
+| HP-UX    | HP                                        | PA-RISC                        |
+| Solaris  | Sun                                       | SPARC                          |
+| Linux    | Red Hat Linux、<br />Ubuntu Linux ... ... | IA(Intel、AMD、Cyrix、RISE...) |
+
+
+
+>  	Linux系统诞生于1991年，由芬兰大学生李纳斯(Linus Torvalds)和后来陆续加入的众多爱好者共同开发完成。
+>
+> ​	Linux是开源软件，源代码开放的UNIX
+
+Linux内核版本
+
+Linux内核官网：www.kernel.org
+
+内核版本说明
+
+2.6.18
+
+2：主版本
+
+6：次版本
+
+Linux主要发行版本
+
+![](/../linux入门.assets/2018-06-10_090.png)
+
+最主要区别是软件安装的方法不同。
+
+## 1.2 开源软件简介
+
+1. 开源软件
+
+   ![](/../linux入门.assets/2018-06-10_091.png)
+
+   - 使用的自由
+     - 绝大多数开源软件免费
+   - 研究的自己
+     - 可以获得软件源代码
+   - 散布及改良的自由
+     - 可以自由传播、改良甚至销售
+
+   支撑互联网的开源技术
+
+   - LAMP
+     - Linux 操作系统
+     - Apache Web服务器
+     - MySql   数据库
+     - PHP      编程语言
+
+   
+
+   ## 1.3 Linux应用领域
+
+   1. 基于Linux的企业服务器
+
+      www.netcraft.com
+
+      
+
+   2. 嵌入式应用
+
+   3. Linux在电影娱乐业
+
+   ## 1.4 Linux学习方法
+
+# 第二讲 Linux系统安装
+
+## 2.1 VMware虚拟机安装与使用
+
+1. VMware简介
+
+   > ​	VMware是一个虚拟PC的软件，可以在现有的操作系统上虚拟出一个新的硬件环境，相当于模拟出一台新的PC，以此来实现在一台机器上真正同时运行两个独立的操作系统。
+   >
+   > WMware官方网站 http://www.vmware.com
+
+   VMware主要特点：
+
+   - 不需要分区或重新开机就能在同一台PC上使用两种以上的操作系统
+   - 本机系统可以与虚拟机系统网络通信
+   - 可以设定并且随时修改虚拟机操作系统的硬件环境
+
+2. 新建虚拟机
+
+   ![](/../linux入门.assets/2018-06-10_093.png)
+
+   ![](/../linux入门.assets/2018-06-10_092.png)
+
+   ![](/../linux入门.assets/2018-06-10_094.png)
+
+   ![](/../linux入门.assets/2018-06-10_095.png)
+
+   ![](/../linux入门.assets/2018-06-10_096.png)
+
+   ![](/../linux入门.assets/2018-06-10_097.png)
+
+3. 虚拟机硬件设置
+
+   ![](/../linux入门.assets/2018-06-10_098.png)
+
+   
+
+4. 虚拟机使用技巧
+
+   - 快照
+   - 克隆
+
+## 2.2 系统分区
+
+1. 磁盘分区
+   - 磁盘分区是使用分区编辑器（partition editor）在磁盘上划分几个逻辑部分，碟片一旦划分成数个分区（Partition）,不同类的目录与文件可以存储进不同的分区。
+
+分区类型
+
+- 主分区：最多只能有4个。
+- 扩展分区：
+  - 最多只能有1个。
+  - 主分区加扩展分区最多有4个
+  - 不能写入数据，只能包含逻辑分区
+- 逻辑分区
+
+2. 格式化
+
+   - 格式化（高级格式化）又称逻辑格式化，它是指根据用户选定的文件系统（如FAT16、FAT32、NTFS、EXT2、EXT3、EXT4 等），在磁盘的特定区域写入特定数据，在分区中划出一片用于存放文件分配表、目录表等用于文件管理的磁盘空间。
+
+3. 硬件设备文件名
+
+   | 硬件              | 设备文件名           |
+   | ----------------- | -------------------- |
+   | IDE硬盘           | /dev/hd[a-d]         |
+   | SCSI/SATA/USB硬盘 | /dev/sd[a-p]         |
+   | 光驱              | /dev/cdrom或/dev/sr0 |
+   | 软盘              | /dev/fd[0-1]         |
+   | 打印机（25针）    | /dev/lp[0-2]         |
+   | 打印机（USB）     | /dev/usb/lp[0-15]    |
+   | 鼠标              | /dev/mouse           |
+
+   分区设备文件名
+
+   - 设备文件名
+     - /dev/hda1(IDE硬盘接口) 
+     - /dev/sda1(SCSI硬盘接口、SATA硬盘接口)
+
+   接口及传输速度
+
+   | 接口                          | 理论速度 | 主要用途                     |
+   | ----------------------------- | -------- | ---------------------------- |
+   | IDE                           | 133MB/s  |                              |
+   | SCSI                          | 200MB/s  | 服务器                       |
+   | SATA（串口硬盘）1代、2代、3代 | 500MB/s  | 服务器，个人机一般都是此接口 |
+
+   ![](/../linux入门.assets/2018-06-10_099.png)
+
+    >sdb1 主分区
+    >
+    >sdb2 扩展分区
+    >
+    >sdb5、6、7 逻辑分区
+    >
+    >1-4只能给主分区或扩展分区使用，所以逻辑分区是从5开始的，就算主分区和逻辑分区没有分够4个分区，逻辑分区也不能占用1-4。
+
+4. 挂载
+
+   - 必须分区
+     - / (根分区)
+     - swap分区（交换分区（虚拟内存），建议分物理内存的2倍，但最大不超过2GB）
+   - 推荐分区
+     - /boot （启动分区，200MB）：专门用来保存启动时的数据，建议单独分区目的是防止根分区数据写满后，无法启动系统。
+
+   ![](/../linux入门.assets/2018-06-10_100.png)
+
+   从系统上来看，/boot目录、/home目录都是根目录的子目录，但是从硬盘上来看，他们可以每一个目录都有自己独立的硬盘空间。
+
+5. 总结
+
+   - 分区：把大硬盘分为小的逻辑分区
+   - 格式化：写入文件系统
+   - 分区设备文件名：给每个分区定义设备文件名
+   - 挂载： 给每个分区分配挂载点
+
+## 2.3 Linux系统安装
+
+1.安装欢迎界面
+
+如果未进入，请先设置BIOS，按F2或F12进入 
+
+![](/../linux入门.assets/2018-06-10_101.png)
+
+>- “Install or upgrade an existing system”:安装或升级现有系统
+>- “Install system with basic video driver”:安装过程采用基本的显卡驱动
+>- "Rescue installed system": 进入系统修复模式
+>- "Boot from local drive": 退出安装从硬盘启动
+>- "Memory test" : 存储介质检测
+
+2. 选择Skip不检测光盘（光盘没有问题，直接安装）
+
+   ![](/../linux入门.assets/2018-06-10_102.png)
+
+3. 选择Next
+
+   ![](/../linux入门.assets/2018-06-10_103.png)
+
+4. 选择中文简体，Next
+
+   ![](/../linux入门.assets/2018-06-10_104.png)
+
+5. 选择默认的美式键盘，下一步
+
+   ![](/../linux入门.assets/2018-06-10_105.png)
+
+6. 选择基本存储设备，下一步
+
+   ![](/../linux入门.assets/2018-06-10_106.png)
+
+7. 本来就是一个空的硬盘，选择“是，忽略所有数据”
+
+   ![](/../linux入门.assets/2018-06-10_107.png)
+
+8. 主机名默认，选择下一步（在Windows系统中同一局域网中主机名称不能相同，Linux系统中不存在这个问题，可以都使用一样的主机名）
+
+   ![](/../linux入门.assets/2018-06-10_108.png)
+
+9. 使用默认的亚州/上海时间
+
+   ![](/../linux入门.assets/2018-06-10_109.png)
+
+10. 设置密码，下一步
+
+  >密码原则：
+  >
+  >- 复杂性
+  >  - 八位字符以上、大小写字母、数字、符号
+  >  - 不能是英文单词
+  >  - 不能是和用户相关的内容
+  >- 易记忆性
+  >- 时效性
+
+  ![](/../linux入门.assets/2018-06-10_110.png)
+
+11. 选择创建自定义布局，进行手工分区
+
+    ![](/../linux入门.assets/2018-06-10_111.png)
+
+    ​	
+
+12. 进行分区
+
+    ![](/../linux入门.assets/2018-06-10_112.png)
+
+    ![](/../linux入门.assets/2018-06-10_113.png)
+
+    先分/boot分区 200M：
+
+    ![](/../linux入门.assets/2018-06-10_114.png)
+
+    再分swap分区（这里分1G）：
+
+    ![](/../linux入门.assets/2018-06-10_115.png)
+
+    根据需要分/home分区，当然此分区不是必须单独分一个区的，当系统用作文件上传下载服务器时，可分此分区，这里我们也分一个/home分区。
+
+    ![](/../linux入门.assets/2018-06-10_116.png)
+
+    最后“使用全部可用空间”来分“/”根分区：
+
+    ![](/../linux入门.assets/2018-06-10_117.png)
+
+    分区完成，单击“下一步”：
+
+    ![](/../linux入门.assets/2018-06-10_118.png)
+
+    选择“格式化”：
+
+    ![](/../linux入门.assets/2018-06-10_119.png)
+
+    
+
+    
+
+13. 默认选择“在/dev/sda中安装引导装载程序”，单击下一步：
+
+    ![](/../linux入门.assets/2018-06-10_120-1528646106350.png)
+
+14. 软件包选择
+
+    >- Desktop(桌面)
+    >- Minimal Desktop （最小化桌面）
+    >- Minimal (最小化)
+    >- Basic Server (基本服务器)
+    >- Database Server (数据库服务器)
+    >- Web Server (网页服务器)
+    >- Virtual Host (虚拟主机)
+    >- software development workstation (软件开发工作站)
+
+    如果用作服务器，建议选择最小化安装（Minimal），如果是个人使用，可以选择桌面（Desktop）
+
+    但是最小化安装，有一些常用的工作会没有，所以选择基本服务器（Basic Server）
+
+    如果对系统比较了解，可以选择 “现在自定义”，来下一步后选择具体的安装选项。
+
+    这里选择以后自定义：
+
+    ![](/../linux入门.assets/2018-06-10_121-1528646123058.png)
+
+15. 稍等片刻，系统安装完成后，选择“重新引导”
+
+    ![](/../linux入门.assets/2018-06-10_122.png)
+
+16. 选择“重新引导”后，会自动重新进入系统，如果是真实的主机，则需要设置为硬盘启动，然后，进入系统。
+
+17. root下的目录：
+
+    ~~~
     /root/install.log:存储了安装在系统中的软件包及其版本信息
     /root/install.log.syslog:存储了安装过程中留下的事件记录
     /root/anaconda-ks.cfg 以Kickstart配置文件的格式记录安装中设置的选项信息
+    ~~~
 
+    
 
-## 6. 远程登录管理
-
+## 2.4 远程登录管理工具
     虚拟机网络配置：
-    桥接：使用真实的网卡  可以和局域网内同IP段内的其他计算机通信，但是会占用IP
+    桥接：使用真实的网卡，  可以和局域网内同IP段内的其他计算机通信，但是会占用IP，如果真实的网卡可以上网，虚拟机也可以访问互联网
     NAT:通过虚拟网卡vmnet8 只能和本机电脑通信 不会占用IP,如果本机可能访问网络，虚拟机也可以访问互联网
     host_only:通过虚拟网卡vmnet1 只能和本机电脑通信 不会占用IP，只能和本机通信
+
+host_only: host_only是和VMnet1进行通信，设置一下VMnet1的IP
+
+![](/../linux入门.assets/2018-06-11_123.png)
 
 
     ifconfig  查看网卡
@@ -55,10 +361,14 @@ typora-root-url: img
     如果出现设置了桥接，并且在同一个IP地址段的地址后，还是无法连接，则可能针对于笔记本，如果有主机有两块网卡，一个有线网卡，一个无线网卡，
     在桥接时，虚拟机中编加-虚拟机网络配置中  手动设置一下桥 接哪个网卡
 
+在主机中ping 192.168.118.2 如果能通则说明连接上了。
 
+ 
 
+# 第三讲 初学者建议
 
-# 二、学习LINUX的注意事项
+## 3.1 学习Linux的注意事项
+
     注意：1.严格区分大小写
       2.linux中所有内容以文件形式保存，包括硬件
     	硬盘文件是/dev/sd[a-p]
@@ -76,9 +386,9 @@ typora-root-url: img
       
        5.Windows下的程序不能直接在Linux中安装和运行
 
-# 三、服务器管理和维护建议
+## 3.2 服务器管理和维护建议
 
-## 1.各目录作用
+### 3.2.1 各目录的作用
 
 | 目录&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 说明&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -104,9 +414,9 @@ typora-root-url: img
 | /usr/                                                        | 系统软件资源目录。注意usr不是user的缩写，而是" Unix Softwre Resource"的缩写，所以不是存放用户数据，而是存放系统软件资源的目录。系统中安装的软件大多数保存在这里，所以除了/usr/bin/ 和 /usr/sbin/这两个目录，我在介绍几个/usr/下的二级目录 |
 | /var/                                                        | 动态数据保存位置。主要保存缓存、日志以及软件运行所产生的文件 |
 
+### 3.2.2 服务器注意事项
 
-## 2.远程服务器不允许关机，只能重启
-
+	远程服务器不允许关机，只能重启
 	重启时应该关闭服务
 	不要在服务器访问高峰运行高负载命令
 	远程配置防火墙时不要把自己踢出服务器
@@ -116,7 +426,7 @@ typora-root-url: img
 
 
 ​	
-# 四、 Linux常用命令
+# 第四讲 Linux常用命令
 	命令格式
 	命令  【-选项】 【参数】
 	例：  ls -la /etc
@@ -147,7 +457,7 @@ typora-root-url: img
 
 
 ​			
-​			
+			
 ​			
 ### 4.1.2 目录处理命令
 
@@ -1050,7 +1360,7 @@ who返回信息格式
 语法 : logout
 ```
 
-# 五、 文本编辑器Vim
+#  第五讲  文本编辑器Vim
 
 - Vim是一个功能强大的全屏幕文本编辑器，是Linux/UNIX上最常用的文本编辑器，它的作用是建立、编辑、显示文本文件。
 - Vim没有菜单， 只有命令。
@@ -1182,7 +1492,7 @@ ab mymail email@163.com
 ......
 ```
 
-# 六、 软件包管理简介
+#  第六讲 软件包管理简介
 
 ## 6.1 软件包分类
 - 源码包
@@ -1394,7 +1704,8 @@ cp /root/bin/ls /bin/
 
 ## 6.3 rpm包管理-yum在线管理
 
-#红帽子公司需要收费
+***红帽子公司需要收费***
+
 ### 6.3.1 IP地址配置和网络yum源
 
 - 访问内网只需 配ip和子网掩码 访问公同需配置网关和dns、IP、子网掩码缺一不可
@@ -1627,7 +1938,7 @@ RPM包默认安装路径
     - 用于本机使用的，使用二进制包即可。
 
 
-# 七、 用户和用户组管理
+# 第七讲 用户和用户组管理
 ## 7.1 用户配置文件 
 ### 7.1.1 用户配置文件-用户信息文件/etc/passwd
 - 用户管理简介
@@ -1940,7 +2251,7 @@ $ su - root -c "useradd user3"
     -d 用户名： 把用户从组中删除
 # gpasswd 命令是将用户以附加用户的形式加入到组中，可查看/etc/group文件 ，可以看到的都是附加用户。
 ```
-# 八、 权限管理
+#  第八讲  权限管理
 ## 8.1 ACL权限
 access control list 访问控制表
 ### 8.1.1 ACL权限简介与开启
@@ -2327,7 +2638,7 @@ ALL： 代表本机，或者填写本机IP地址
 #普通用户执行sudo赋予的命令
 ```
 
-# 九、文件系统管理
+#  第九讲 文件系统管理
 
 ## 9.1 回顾分区和文件系统
 - 分区类型
@@ -2756,7 +3067,7 @@ cgroup  disk1  home   lost+found  mnt    proc  sbin     sys      tmp
 #如果不报错，则说明配置正确
 ```
 
-# 十、Shell基础
+#  第十讲 Shell基础
 
 ## 10.1 Shell概述
 
@@ -5655,17 +5966,437 @@ fi
 
 ## 14.2 rsyslogd日志服务
 
+1. 日志文件格式
+
+   - 基本日志格式包含以下四列：
+     - 事件产生的时间；
+     - 发生事件的服务器的主机名；
+     - 产生事件的服务名或程序名；
+     - 事件的具体信息。 
+
+2. /etc/rsyslog.conf配置文件
+
+   authpriv.*   			/var/log/secure
+
+   ~~~
+   authpriv.* 				/var/log/secure
+   #服务名称[连接符号]日志等级		日志记录位置
+   #认证相关服务。所有日志等级		记录在/var/log/secure日志中
+   ~~~
+
+   服务名称
+
+   | 服务名称      | 说明                                                         |
+   | ------------- | ------------------------------------------------------------ |
+   | auth          | 安全和认证相关消息(不推荐使用authpriv替代)                   |
+   | authpriv      | 安全和认证相关消息(私有的)                                   |
+   | cron          | 系统定时任务cront和at产生的日志                              |
+   | daemon        | 和各个守护进程相关的日志                                     |
+   | ftp           | ftp守护进程产生的日志                                        |
+   | kern          | 内核产生的日志(不是用户进程产生的)                           |
+   | local0-local7 | 为本地使用预留的服务                                         |
+   | lpr           | 打印产生的日志                                               |
+   | mail          | 邮件收发信息                                                 |
+   | news          | 与新闻服务器相关的日志                                       |
+   | syslog        | 有syslogd服务产生的日志信息（虽然服务名称已经改为rsyslogd,但是很多配置都还是沿用了syslogd的，这里并没有修改服务名）。 |
+   | user          | 用户等级类别的日志信息                                       |
+   | uucp          | uucp子系统的日志信息，uucp是早期linux系统进行数据传递的协议，后来也常用在新闻组服务中。 |
+
+   连接符号：
+
+- 连续符号可以识别为：
+
+  - "*"代表所有日志等级，比如:"authpriv.\*" 代表authpriv认证信息服务产生的日志，所有的日志等级都记录
+  - "."代表只要比后面的等级高的(包含该等级) 日志都记录下来。比如：“cron.info”代表cron服务产生的日志，只要日志等级大于等于info级别，就记录
+  - ".="代表只记录所需等级的日志，其他等级的都不记录。比如:"*.=emerg" 代表人和日志服务产生的日志，只要等级是emerg等级就记录。这种用法及少见，了解就好
+  - ".!"代表不等于，也就是除了该等级的日志外，其他等级的日志都记录。
+
+  日志等级：
+
+  | 等级名称 | 说明                                                         |
+  | -------- | ------------------------------------------------------------ |
+  | debug    | 一般的调试信息说明                                           |
+  | info     | 基本的通知信息                                               |
+  | notice   | 普通信息，但是有一定的重要性                                 |
+  | warning  | 警告信息，但是还不会影响到服务或系统的运行                   |
+  | err      | 错误信息，一般达到err等级的信息以及可以影响到服务或系统的运行了。 |
+  | crit     | 临界状况信息，比err等级还要严重                              |
+  | alert    | 警告状态信息，比crit还要严重。必须立即采取行动               |
+  | emerg    | 疼痛等级信息，系统已经无法使用了                             |
+
+  日志记录位置：
+
+  - 日志文件的绝对路径，如"/var/log/secure"
+  - 系统设备文件，如"/dev/lp0"
+  - 转发给远程主机,如"@192.168.0.210:514"
+  - 用户名， 如"root"
+  - 忽略或丢弃日志，如"~"
+
 ## 14.3 日志轮替
 
+轮替：切割、轮换
 
+1. 日志文件的命名规则
+
+   - 如果配置文件中拥有"dateext"参数，那么日志会用日期来作为日志文件的后缀，例如“secure-20130605” 。这样的话日志文件名不会重叠，所以也就不需要日志文件的改名，只需要保存指定的日志个数，删除多余的日志文件即可。
+   - 如果配置文件中没有"dateext"参数，那么日志文件就需要进行改名了。当第一次进行日志轮替时，当前的“secure”日志会自动改名为"secure.1"，然后新建"secure"日志，用来保存新的日志。当第二次进行日志轮替时，"secure.1"会自动改名为"secure.2"，当前的"secure"日志会自动改名为"secure.1"，然后也会新建“secure”日志，用来保存新的日志，以此类推。
+
+2. logrotate配置文件
+
+   | 参数                    | 参数说明                                                     |
+   | ----------------------- | ------------------------------------------------------------ |
+   | daily                   | 日志的轮替周期是每天                                         |
+   | weekly                  | 日志的轮替周期是每周                                         |
+   | monthly                 | 日志的轮替周期是每月                                         |
+   | rotate 数字             | 保留的日志文件的个数。0指没有备份                            |
+   | compress                | 日志轮替时，旧的日志进行压缩                                 |
+   | create mode owner group | 建立新日志，同时指定新日志的权限与所有者和所属组。如create 0600 root utmp |
+   | mail address            | 当日志轮替时，输出内容通过邮件发送到指定的邮件地址。如mail axin@hao456.top |
+   | missingok               | 如果日志不存在，则忽略该日志的警告信息                       |
+   | notifempty              | 如果日志为空文件，则不进行日志轮替                           |
+   | minsize 大小            | 日志轮替的最小值。也就是日志一定要达到这个最小值才会轮替，否则就算时间达到也不轮替 |
+   | size 大小               | 日志只有大于指定大小才进行日志轮替，而不是按照时间轮替。如size 100k |
+   | dateext                 | 使用日期作为日志轮替文件的后缀。如secure-20160610            |
+
+   ~~~
+   [root@localhost ~]# vim /etc/logrotate.conf
+   # see "man logrotate" for details
+     2 # rotate log files weekly
+     3 weekly #此配置对所有配置文件有效
+     4 
+     5 # keep 4 weeks worth of backlogs
+     6 rotate 4
+     7 
+     8 # create new (empty) log files after rotating old ones
+     9 create
+    10 
+    11 # use date as a suffix of the rotated file
+    12 dateext
+    13 
+    14 # uncomment this if you want your log files compressed
+    15 #compress
+    16 
+    17 # RPM packages drop log rotation information into this directory
+    18 include /etc/logrotate.d
+    19 
+    20 # no packages own wtmp and btmp -- we'll rotate them here
+    21 /var/log/wtmp {
+    22     monthly
+    23     create 0664 root utmp
+    24         minsize 1M
+    25     rotate 1
+    26 }  #此处配置只对/var/log/wtmp 日志文件有效
+    27 
+    28 /var/log/btmp {
+    29     missingok
+    30     monthly
+    31     create 0600 root utmp
+    32     rotate 1
+    33 } #此处配置只对/var/log/btmp 日志文件有效
+    34 
+    35 # system-specific logs may be also be configured here.
+   ~~~
+
+
+
+3. 把apache日志加入轮替
+
+   ~~~
+   [root@localhost ~]# vi /etc/logrotate.conf
+   /usr/local/apache2/logs/access_log{
+       daily
+       create
+       rotate 30
+   }
+   #RPM包安装的服务默认支持日志轮替，但源码包的日志轮替不支持。
+   #rsyslogd默认搜索的是/var/log目录，它不会搜索源码包指定的位置。
+   #加入到文件中后，其他什么都不用管，系统会在每天凌晨进行备份，因为系统的定时任务在此配置文件中写入的都加入了。
+   ~~~
+
+4. logrotate命令
+
+   ~~~
+   [root@localhost ~]# logrotate [选项] 配置文件名
+   选项：
+   	如果此命令没有选项，则会按照配置文件中的条件进行日志轮替
+   	-v:显示日志轮替过程。加了-v选项，会显示日志的轮替的过程
+   	-f:强制进行日志轮替。不管日志轮替的条件是否已经符合，强制配置文件中所有的日志进行轮替
+   	
+   例：
+   [root@localhost ~]# logrotate -v /etc/logrotate.conf
+   
+   ~~~
+
+
+
+#  第十五讲 启动管理
+
+## 15.1 CentOS 6.3 启动管理
+
+### 15.1.1 系统运行级别
+
+​	1. 运行级别
+
+| 运行级别 | 含义                                                         |
+| -------- | ------------------------------------------------------------ |
+| 0        | 关机                                                         |
+| 1        | 单用户模式，可以想象为windows的安全模式，主要用于系统修复    |
+| 2        | 不安全的命令行模式，<br />不含NFS服务（NFS:Linux和Linux之间共享文件的服务） |
+| 3        | 安全的命令行模式，就是标准字符界面                           |
+| 4        | 系统保留                                                     |
+| 5        | 图形模式                                                     |
+| 6        | 重启动                                                       |
+
+2. 运行级别命令
+
+   ~~~
+   [root@localhost ~]# runlevel
+   #查看运行级别
+   N 3
+   #N:代表上一个运行级别（N:表示为null,一开机就进入到了级别3）
+   #3：代表当前运行级别
+   ~~~
+
+   ~~~
+   [root@localhost ~]# init 运行级别
+   #改变运行级别
+   ~~~
+
+3. 系统默认运行级别
+
+   ~~~
+   [root@localhost ~]# vim /etc/inittab
+   id:3:initdefault:
+   #系统开机后直接进入哪个运行级别，一般3或5
+   
+   ~~~
+
+   
+
+### 15.1.2 系统启动过程（字符界面）
+
+![](/../linux入门.assets/2018-06-10_087.png)
+
+系统启动时，会自动加载驱动到内核中，但是有些不常用的驱动不会加载，因为会导致内核变的很大，系统会将驱动文件放在/lib/model目录中，需要时再加载此驱动。
+
+initramfs 在/boot/目录下
+
+initramfs内存文件系统
+
+- CentOS 6.x 中使用initramfs内存文件系统取代了CentOS 5.x中的initrd RAM Disk。他们的作用类似，可以通过启动引导程序加载到内存中，然后加载启动过程中所需要的内核模式，比如USB、STAT、SCSI硬盘的驱动和LVM、RAID文件系统的驱动
+
+- 手工模拟解压过程（此过程在内核中直接运行）
+
+  ~~~
+  mkdir /tmp/initramfs
+  #建立测试目录
+  cp /boot/initramfs-2.6.32-279.e16.i868.img /tmp/initramfs/
+  #复制initramfs文件
+  cd /tmp/initramfs/
+  file initramfs-2.6.32-279.e16.i868.img
+  mv initramfs-2.6.32-279.e16.i868.img initramfs-2.6.32-279.e16.i868.img.gz
+  #修改文件的后缀名为.gz
+  gunzip initramfs-2.6.32-279.e16.i868.img.gz
+  #解压缩
+  file initramfs-2.6.32-279.e16.i686.img
+  cpio -ivcdu < initramfs-2.6.32-279.e16.i868.img
+  #解压缩
+  ~~~
+
+/sbin/init: 是所有进程的父进程
+
+调用/etc/init/rcS.conf配置文件
+
+- 主要功能是两个：
+  - 先调用/etc/rc.d/rc.sysinit, 然后由/etc/rc.d/rc.sysinit配置文件进行Linux系统初始化。
+  - 然后再调用/etc/inittab,然后由/etc/inittab配置文件确定系统的默认运行级别。
+  - 由/etc/rc.d/rc.sysinit初始化
+    - 1. 获得网络环境
+      2. 挂载设备
+      3. 开机启动画面Plymouth（取替了过往的RHGB）
+      4. 判断是否启用SELinux
+      5. 显示于开机过程中的欢迎画面
+      6. 初始化硬件
+      7. 用户自定义模块的加载
+      8. 配置内核的参数
+      9. 设置主机名
+      10. 同步存储器
+      11. 设备映射器及相关的初始化
+      12. 初始化软件磁盘阵列（RAID）
+      13. 初始化LVM的文件系统功能
+      14. 检验磁盘文件系统（fsck）
+      15. 设置磁盘配额（quota）
+      16. 重新以可读写模式挂载系统磁盘
+      17. 重新quota（非必要）
+      18. 启动系统虚拟随机数生成器
+      19. 配置机器（非必要）
+      20. 清除开机过程当中的临时文件
+      21. 创建ICE目录
+      22. 启动交换分区（swap）
+      23. 将开机信息写入/var/log/dmesg文件中
+
+调用/etc/rc.d/rc文件
+
+- 运行级别参数传入/etc/rc.d/rc这个脚本之后，由这个脚本文件按照不同的运行级别启动/etc/rc[0-6].d/目录中的相应的程序
+  - /etc/rc3.d/k??开头的文件 （??是数字），会按照数字顺序依次关闭
+  - /etc/rc3.d/S??开头的文件（??是数字)，会按照数字顺序依次启动
+
+## 15.2 启动引导程序grub
+
+## 15.3 系统修复模式
+
+# 第十六讲 备份与恢复
+
+## 16.1 备份概述
+
+1.  Linux系统需要备份的数据
+
+   - /root/目录：
+   - /home/目录：
+   - /var/spool/mail/目录：
+   - /etc/目录：
+   - 其他目录：日志等
+
+2. 安装服务的数据
+
+   - apache需要备份的数据
+     - 配置文件
+     - 网页主目录
+     - 日志文件
+   - mysql需要备份的数据
+     - 源码包安装的mysql:  /usr/local/mysql/data/
+       - 5.5以上版本为：data目录
+       - 5.5以前版本为：var目录
+     - RPM包安装的mysql: /var/lib/mysql/
+
+3. 备份策略
+
+   - 完全备份：完全备份就是指把所有需要备份的数据全部备份，当然完全备份可以备份整块硬盘，整个分区或某个具体的目录
+
+   - 增量备份：每次备份只备份新增的数据
+
+     ![](/../linux入门.assets/2018-06-10_088.png)
+
+   - 差异备份：
+
+     ![](/../linux入门.assets/2018-06-10_089.png)
+
+     
+
+## 16.2 dump和restore命令
+
+1. dump命令
+
+   ~~~
+   [root@localhost ~]# dump [选项] 备份之后的文件名 原文件或目录
+   选项：
+   	-level: 就是我们说的0-9十个备份级别， 例如 -0；0代表完全备份，1代表第1次增量备份，2代表第2次增量备份。以此类推，共到9。
+   	-f 文件名：指定备份之后的文件名
+   	-u:		备份成功之后，把备份时间记录在/etc/dumpdates文件中
+   	-v:		显示备份过程中更多的输出信息
+   	-j:		调用bzlib库压缩备份文件，其实就是把备份文件压缩为.bz2格式
+   	-W:		显示允许被dump的分区的备份等级及备份时间
+   ~~~
+
+   ~~~
+   [root@localhost ~]# rpm -qa | grep dump
+   tcpdump-4.0.0-5.20090921gitdf3cb4.2.el6.x86_64
+   #查询dump是否安装,tcpdump并不是dump,而是一个抓包工具。
+   
+   [root@localhost ~]# yum -y install dump
+   #如果没有安装，确定yum源可用后，执行yum命令进行安装
+   ~~~
+
+   例：备份分区
+
+   ~~~
+   [root@localhost ~]# dump -0uj -f /root/boot.bak.bz2 /boot/
+   #备份命令。先执行一次完全备份，并压缩和更新备份时间
+   [root@localhost ~]# cat /etc/dumpdates
+   #查看备份时间文件
+   [root@localhost ~]# cp install.log /boot/
+   #复制日志文件到/boot分区
+   [root@localhost ~]# dump -1uj -f /root/boot.bak1.bz2 /boot/
+   #增量备份/boot分区，并压缩
+   [root@localhost ~]# dump -W
+   #查询分区的备份时间及备份级别
+   ~~~
+
+   例：备份文件或目录
+
+   ~~~
+   [root@localhost ~]# dump -0j -f /root/etc.dump.bz2 /etc/
+   #完全备份/etc/目录，如果备份的是目录，只能使用0级别进行完全备份，而不再支持增量备份。只有备份分区才支持增量备份。
+   ~~~
+
+2. restore命令
+
+   ~~~
+   [root@localhost ~]# restore [模式选项] [选项]
+   模式选项：restore命令常用的模式有以下四种，这四个模式不能混用，只能用一个。
+   	-C:	比较备份数据和实际数据的变化
+   	-i: 进入交互模式，手工选择需要恢复的文件。
+   	-t:	查看模式，用于查看备份文件中拥有哪些数据。
+   	-r:	还原模式，用于数据还原。
+   选项：
+   	-f:	指定备份文件的文件名
+   ~~~
+
+   比较备份数据和实际数据的变化
+
+   ~~~
+   [root@localhost ~]# mv /boot/vmlinuz-2.6.32-279.e16.i868 /boot/vmlinuz-2.6.32-279.e16.i686.bak
+   #备/boot目录中内核镜像文件改个名字
+   [root@localhost ~]# restore -C -f /root/boot.bak.bz2
+   Dump tape is compressed.
+   Dump   date: Mon Jun 11 00:39:31 2018
+   Dumped from: the epoch
+   Level 0 dump of /boot on bogon:/dev/sda1
+   Label: none
+   filesys = /boot
+   restore: unable to stat ./vmlinuz-2.6.32-573.el6.x86_64: No such file or directory
+   Some files were modified!  1 compare errors
+   #比较备份文件与现有文件进行有何差异，结果restore发现内核镜像文件丢失
+   
+   ~~~
+
+   查看模式
+
+   ~~~
+   [root@localhost ~]# restore -t -f boot.bak.bz2
+   ~~~
+
+   还原模式（分区）
+
+   ~~~
+   #还原boot.bak.bz2分区的增量备份
+   [root@localhost ~]# mkdir boot.test
+   [root@localhost ~]# cd boot.test/
+   #在哪个目录执行，就会恢复到哪个目录中，所有单独建立一个目录，恢复到这个目录中。
+   #先还原完全备份的数据
+   #再恢复增量备份的数据
+   [root@localhost ~]# restore -r -f /root/boot.bak.bz2
+   #解压缩
+   [root@localhost ~]# restore -r -f /root/book.bak1.bz2
+   #恢复增量备份数据
+   #恢复每一个级别的增量备份...
+   ~~~
+
+   还原模式（文件/目录）
+
+   ~~~
+   #还原文件
+   #还原/etc/目录的备份etc.dump.bz2
+   [root@localhost ~]# restore -r -f etc.dump.bz2
+   #还原etc.dump.bz2备份
+   ~~~
+
+   
 
 ```
 
 [root@localhost ~]#
 [root@localhost ~]#
 [root@localhost ~]#
-[root@localhost ~]#
-[root@localhost ~]#
-
 
 ```
