@@ -101,5 +101,56 @@ $ git stash apply stash@{0} #回到未完成工作的状态
 
 - stash@{0} :可以使用$ git stash list 进行查看
 
+## 八、克隆远程仓库
+
+~~~bash
+$ git clone 仓库url
+~~~
+
+> 自动创建了master分支,用于跟踪远程仓库的master分支,打开项目文件夹/.git/config文件可以看到master和远程master分支的关联
+
+## 九、注册远程仓库
+
+~~~bash
+$ git remote add 远程仓库名(一般用origin) 仓库url
+~~~
+
+## 十、推送数据到远程仓库
+
+~~~bash
+$ git push -u [远程仓库名(origin)] [本地推送的分支名]
+~~~
+
+> -u :表示建立追踪，这样git status 会显示本地分支与远程分支的偏离情况,一般第一次提交数据时加此参数
+
+## 十一、抓取数据
+
+~~~bash
+$ git fetch origin
+~~~
+
+> 从远程仓库抓取数据，但不会影响本地仓库
+
+~~~bash
+$ git pull 
+#相当于 $ git fetch, $ git merge
+~~~
+
+> 此方式会改变本地仓库
+
+## 十二、查看日志
+
+~~~bash
+$ git log --no-merges origin/master
+~~~
+
+> 查看在推送之前服务器发生了哪些变化
+
+## 十三、远程仓库的分支合并
+
+~~~bash
+$ git merge 远程仓库名/分支名
+~~~
+
 
 
